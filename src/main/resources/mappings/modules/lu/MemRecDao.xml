@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.lu.dao.MemRecDao">
+    
+	<sql id="memRecColumns">
+		a.mem_id AS "memId",
+		a.pro_id AS "proId",
+		a.rec_state AS "recState",
+		a.gro_id AS "groId",
+		m.name AS "member.name",
+		p.name AS "project.name",
+		g.start_time AS "group.startTime",
+		g.end_time AS "group.endTime",
+		m.tel AS "member.tel",
+		g.number AS "group.number"
+	</sql>
+	
+	<sql id="memRecJoins">
+		LEFT JOIN lu_member m ON m.mem_id=a.mem_id
+		LEFT JOIN lu_project p ON p.pro_id=a.pro_id
+		LEFT JOIN lu_group g ON g.gro_id=a.gro_id
+	</sql>
+    
+	<select id="get" resultType="MemRec">
+		SELECT 
+			<include refid="memRecColumns"/>
+		FROM lu_mem_rec a
+		<include refid="memRecJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getCeilling" resultType="int">
+		SELECT 
+			*
+		FROM lu_ceiling
+	</select>
+	
+	<select id="getMemCeilling" resultType="int">
+		SELECT 
+			count(1)
+		FROM lu_mem_rec a
+		<where>
+			<if test="id != null and id != ''">
+				AND a.mem_id = #{id}
+			</if>
+				AND a.rec_state = '1'
+		</where>
+	</select>	
+	
+	<select id="findList" resultType="MemRec">
+		SELECT 
+			<include refid="memRecColumns"/>
+		FROM lu_mem_rec a
+		<include refid="memRecJoins"/>
+		<where>
+			<if test="memTel != null and memTel != ''">
+				AND m.tel LIKE 
+					<if test="dbName == 'oracle'">'%'||#{memTel}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{memTel}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{memTel},'%')</if>
+			</if>
+			<if test="groNum != null and groNum != ''">
+				AND g.number = #{groNum}
+			</if>
+			<if test="memId != null and memId != ''">
+				AND a.mem_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{memId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{memId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{memId},'%')</if>
+			</if>
+			<if test="proId != null and proId != ''">
+				AND a.pro_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{proId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{proId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{proId},'%')</if>
+			</if>
+			<if test="recState != null and recState != ''">
+				AND a.rec_state LIKE 
+					<if test="dbName == 'oracle'">'%'||#{recState}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{recState}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{recState},'%')</if>
+			</if>
+			<if test="groId != null and groId != ''">
+				AND a.gro_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{groId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{groId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{groId},'%')</if>
+			</if>
+			<if test="createDate != null and createDate != ''">
+				AND a.create_date = #{createDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MemRec">
+		SELECT 
+			<include refid="memRecColumns"/>
+		FROM lu_mem_rec a
+		<include refid="memRecJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lu_mem_rec(
+			id,
+			mem_id,
+			pro_id,
+			rec_state,
+			gro_id,
+			create_date
+		) VALUES (
+			#{id},
+			#{memId},
+			#{proId},
+			#{recState},
+			#{groId},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lu_mem_rec SET 	
+			mem_id = #{memId},
+			pro_id = #{proId},
+			rec_state = #{recState},
+			gro_id = #{groId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM lu_mem_rec
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

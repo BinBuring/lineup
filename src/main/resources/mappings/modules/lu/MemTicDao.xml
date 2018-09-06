@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.lu.dao.MemTicDao">
+    
+	<sql id="memTicColumns">
+		a.tickets_id AS "ticketsId",
+		a.mem_id AS "memId"
+	</sql>
+	
+	<sql id="memTicJoins">
+	</sql>
+    
+	<select id="get" resultType="MemTic">
+		SELECT 
+			<include refid="memTicColumns"/>
+		FROM lu_mem_tic a
+		<include refid="memTicJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MemTic">
+		SELECT 
+			<include refid="memTicColumns"/>
+		FROM lu_mem_tic a
+		<include refid="memTicJoins"/>
+		<where>
+			
+			<if test="ticketsId != null and ticketsId != ''">
+				AND a.tickets_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{ticketsId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{ticketsId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{ticketsId},'%')</if>
+			</if>
+			<if test="memId != null and memId != ''">
+				AND a.mem_id = #{memId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MemTic">
+		SELECT 
+			<include refid="memTicColumns"/>
+		FROM lu_mem_tic a
+		<include refid="memTicJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lu_mem_tic(
+			tickets_id,
+			mem_id
+		) VALUES (
+			#{ticketsId},
+			#{memId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lu_mem_tic SET 	
+			tickets_id = #{ticketsId},
+			mem_id = #{memId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM lu_mem_tic
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

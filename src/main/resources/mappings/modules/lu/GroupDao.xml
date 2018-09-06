@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.lu.dao.GroupDao">
+    
+	<sql id="groupColumns">
+		a.gro_id AS "groId",
+		a.pro_id AS "proId",
+		a.number AS "number",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		pro.name AS "project.name"
+	</sql>
+	
+	<sql id="groupJoins">
+		LEFT JOIN lu_project pro ON pro.pro_id = a.pro_id
+	</sql>
+    
+	<select id="get" resultType="Group">
+		SELECT 
+			<include refid="groupColumns"/>
+		FROM lu_group a
+		<include refid="groupJoins"/>
+		WHERE a.gro_id = #{id}
+	</select>
+	
+	<select id="getByTimeProId" resultType="Group">
+		SELECT 
+			<include refid="groupColumns"/>
+		FROM lu_group a
+		<include refid="groupJoins"/>
+		<where>
+			<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+				AND	#{time} BETWEEN a.start_time AND a.end_time
+			</if>
+			<if test="proId != null and proId != ''">
+				AND	a.pro_id = #{proId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="Group">
+		SELECT 
+			<include refid="groupColumns"/>
+		FROM lu_group a
+		<include refid="groupJoins"/>
+		<where>
+			<if test="number != null and number != ''">
+				AND a.number = #{number}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.start_time &lt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time &gt;= #{endTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.pro_id,a.number
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Group">
+		SELECT 
+			<include refid="groupColumns"/>
+		FROM lu_group a
+		<include refid="groupJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lu_group(
+			gro_id,
+			pro_id,
+			number,
+			start_time,
+			end_time
+		) VALUES (
+			#{groId},
+			#{proId},
+			#{number},
+			#{startTime},
+			#{endTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lu_group SET 	
+			pro_id = #{proId},
+			number = #{number},
+			start_time = #{startTime},
+			end_time = #{endTime}
+		WHERE gro_id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM lu_group
+		WHERE gro_id = #{id}
+	</update>
+	
+	<update id="deleteByProId">
+		DELETE FROM lu_group
+		WHERE pro_id = #{proId}
+	</update>
+	
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.lu.dao.ProjectDao">
+    
+	<sql id="projectColumns">
+		a.pro_id AS "id",
+		a.name AS "name",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.administrator AS "administrator.id",
+		u5.name AS "administrator.name",
+		a.group_num AS "groupNum",
+		a.all_group AS "allGroup",
+		a.group_data AS "groupData",
+		a.status AS "status",
+		a.isdelete AS "isdelete",
+		a.address AS "address",
+		a.features AS "features",
+		a.url AS "url"
+	</sql>
+	
+	<sql id="projectJoins">
+		LEFT JOIN sys_user u5 ON u5.id = a.administrator
+	</sql>
+    
+	<select id="get" resultType="Project">
+		SELECT 
+			<include refid="projectColumns"/>
+		FROM lu_project a
+		<include refid="projectJoins"/>
+		WHERE a.pro_id = #{id}
+		and a.isdelete = '1'
+	</select>
+	
+	<select id="findList" resultType="Project">
+		SELECT 
+			<include refid="projectColumns"/>
+		FROM lu_project a
+		<include refid="projectJoins"/>
+		<where>
+			and a.isdelete = '1'
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.start_time &lt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.end_time &gt;= #{endTime}
+			</if>
+			<if test="administrator != null and administrator.id != null and administrator.id != ''">
+				AND a.administrator = #{administrator.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Project">
+		SELECT 
+			<include refid="projectColumns"/>
+		FROM lu_project a
+		<include refid="projectJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lu_project(
+			pro_id,
+			name,
+			start_time,
+			end_time,
+			administrator,
+			group_num,
+			all_group,
+			group_data,
+			status,
+			isdelete,
+			address,
+			features,
+			url
+		) VALUES (
+			#{id},
+			#{name},
+			#{startTime},
+			#{endTime},
+			#{administrator.id},
+			#{groupNum},
+			#{allGroup},
+			#{groupData},
+			#{status},
+			#{isdelete},
+			#{address},
+			#{features},
+			#{url}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lu_project SET 	
+			pro_id = #{id},
+			name = #{name},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			administrator = #{administrator.id},
+			group_num = #{groupNum},
+			group_data = #{groupData},
+			status = #{status},
+			address = #{address},
+			features = #{features},
+			url = #{url},
+			all_group = #{allGroup}
+		WHERE pro_id = #{id}
+	</update>
+	<update id="delete">
+		UPDATE lu_project
+		SET isdelete = '2'
+		WHERE pro_id = #{id}
+	</update>
+	<!-- <update id="delete">
+		DELETE FROM lu_project
+		WHERE pro_id = #{id}
+	</update> -->
+	
+</mapper>

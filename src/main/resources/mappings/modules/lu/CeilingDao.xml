@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.lu.dao.CeilingDao">
+    
+	<sql id="ceilingColumns">
+		a.rec_ceiling AS "recCeiling"
+	</sql>
+	
+	<sql id="ceilingJoins">
+	</sql>
+    
+	<select id="get" resultType="Ceiling">
+		SELECT 
+			<include refid="ceilingColumns"/>
+		FROM lu_ceiling a
+		<include refid="ceilingJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Ceiling">
+		SELECT 
+			<include refid="ceilingColumns"/>
+		FROM lu_ceiling a
+		<include refid="ceilingJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Ceiling">
+		SELECT 
+			<include refid="ceilingColumns"/>
+		FROM lu_ceiling a
+		<include refid="ceilingJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lu_ceiling(
+			rec_ceiling
+		) VALUES (
+			#{recCeiling}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lu_ceiling SET 	
+			rec_ceiling = #{recCeiling}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM lu_ceiling
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

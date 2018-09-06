@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.lu.dao.MemberDao">
+    
+	<sql id="memberColumns">
+		a.mem_id AS "id",
+		a.name AS "name",
+		a.rec_num AS "recNum",
+		a.tel AS "tel",
+		a.age AS "age",
+		a.sex AS "sex",
+		a.email AS "email",
+		a.status AS "status",
+		a.isdelete AS "isdelete"
+	</sql>
+	
+	<sql id="memberJoins">
+	</sql>
+    
+	<select id="get" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM lu_member a
+		<include refid="memberJoins"/>
+		WHERE a.mem_id = #{id}
+	</select>
+	
+	<select id="getByTel" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM lu_member a
+		<include refid="memberJoins"/>
+		WHERE a.tel = #{tel}
+	</select>	
+	
+	<select id="findList" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM lu_member a
+		<include refid="memberJoins"/>
+		<where>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="age != null and age != ''">
+				AND a.age = #{age}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+				AND a.isdelete = '1'
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM lu_member a
+		<include refid="memberJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lu_member(
+			mem_id,
+			name,
+			rec_num,
+			tel,
+			age,
+			sex,
+			email,
+			status,
+			isdelete
+		) VALUES (
+			#{id},
+			#{name},
+			'0',
+			#{tel},
+			#{age},
+			#{sex},
+			#{email},
+			'1',
+			'1'
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lu_member SET 	
+			name = #{name},
+			rec_num = #{recNum},
+			tel = #{tel},
+			age = #{age},
+			sex = #{sex},
+			email = #{email},
+			status = #{status}
+		WHERE mem_id = #{id}
+	</update>
+	<update id="delete">
+		UPDATE lu_member SET 
+			isdelete = '2'
+		WHERE mem_id = #{id}
+	</update>
+	<!-- <update id="delete">
+		DELETE FROM lu_member
+		WHERE mem_id = #{id}
+	</update> -->
+	
+</mapper>
